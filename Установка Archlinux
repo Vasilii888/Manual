@@ -1,0 +1,62 @@
+Установка “базового” Archlinux.
+
+1. lsblk — выводит список подключенный дисков.
+
+2. cfdisk /dev/[name] — “разбиваем” диск на две дериктории и выделяем память, например sda1(или nvme0n1p1) — 300-400Мб.  для uefi; sda2(или nvme0n1p2) — все остальное пространство.
+“Если стоит nvme ssd то sda -nvme0n1 (p1 или p2)”
+
+3. форматирование: mkfs.fat -F32 /dev/sda1 и  mkfs.ext4  /dev/sda2.
+
+4. монтируем корень системы: mount /dev/sda2   /mnt ;
+     создаем папку boot: mkdir /mnt/boot ;
+     монтируем в нее раздел uefi: mount /dev/sda1    /mnt/boot
+
+5. Установка непосредственно archlinux: pacstrap /mnt base linux linux-firmware
+	где  base - минимальный набор пакетов для базовой установки Arch Linux;
+	linux — ядро линукс (смотри https://wiki.archlinux.org/title/%D0%AF	%D0%B4%D1%80%D0%B0);
+	linux-firmware - файлы прошивки для Linux (нужно для работы переферийных 	устройств)
+	если не устанавливается то прописываем: pacman -S archlinux-keyring
+
+6. Сгенерируем файл fstab, который используется для настройки параметров монтирования разделов на диске : genfstab  -U  /mnt  »  /mnt/etc/fstab
+
+7.   Перейдем к корневому каталогу системы: arch-chroot /mnt
+
+8. Установка первых пакетов: pacman -S networkmanager nano sudo
+	где,  networkmanager - это программа для обеспечения обнаружения и 	настройки     систем и автоматического подключения к сетям;
+	nano — консольный текстовый редактор.
+	sudo — необходим для работы с правами суперпользователя.
+
+9. systemctl enable  NetworkManager.service — для автоматического подклбчения интернета.
+
+10. Отредактируем файл /etc/locale.gen, раскомментировав en_US.UTF-8 и другие необходимые локали (например, ru_RU.UTF-8 UTF-8), после чего сгенерируйте их:
+	nano  /etc/locale.gen — открываем файл и редактируем.
+	locale-gen — генерируем локали.
+	localectl set-locale ru_UA.UTF-8 если не работает, или пишет ошибку то: echo "LANG = ru_UA.UTF-8"  >  /etc/locale.conf  можно указывать любую локаль, если русская не работает, или вместо кирилици будут иероглифы, замени на en_US.UTF-8.
+
+11. Задаем часовой пояс: ln -sf /usr/share/zoneinfo/Регион/Страна /etc/localtime
+	чтобы проверить: timedatectl
+	если не работает смотри https://wiki.archlinux.org/title/%D0%A0%D1%83%D0%BA%D0%BE%D0%B2%D0%BE%D0%B4%D1%81%D1%82%D0%B2%D0%BE_%D0%BF%D0%BE_%D1%83%D1%81%D1%82%D0%B0%D0%BD%D0%BE%D0%B2%D0%BA%D0%B5
+
+12. Установим пароль суперпользователя: passwd
+
+13. Создаем пользователя: useradd   -m -g  users  -G wheel -s  /bin/bash  [имя_пользователя]
+	passwd  [имя_пользователя] — придумываем пароль пользователю.
+	EDITOR =nano visudo — раздаем ему права, добавляем в открывшейся файл: 
+	[имя_пользователя] ALL = (ALL) ALL сохраняем и выходим.
+
+14. Устанавливаем загрузчик: pacman -S grub efibootmgr
+	создаем директорию загрузки: mkdir  /boot/efi
+	монтируем наш sda1: mount /dev/sda1  /boot/efi
+	Две следующие строки запустят наш загрузчик:
+	1. grub-install  --target=x86_64-efi  --efi-directory=/boot/efi  --bootloader-	id=GRUB  --removable.
+	2. grub-mkconfig  -o  /boot/grub/grub.cfg
+
+18. Пишем: exit ; для выхода из суперпользователя.
+
+19. Размантируем папку: umount -R /mnt
+
+20. Перезагружаемся: reboot
+После перезагрузки мы уже попадем в установленный archlinux, первым делом обновим систему: sudo pacman -Suy , можно поставить nejfetch чтобы вывести характеристики ПК на экран.  
+
+Arch готов к работе!
+Ссылки: https://wiki.archlinux.org/title/installation_guide_(%D0%A0%D1%83%D1%81%D1%81%D0%BA%D0%B8%D0%B9)
