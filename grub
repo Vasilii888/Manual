@@ -1,0 +1,17 @@
+sudo  nano /etc/default/grub
+
+GRUB_CMDLINE_LINUX_DEFAULT="rootfstype=ext4  libahci.ignore_sss=1 raid=noautodetect selinux=0 lpj=10986963"
+
+
+    rootfstype=ext4 - указываем в какую файловую систему отформатирован корень. У меня ext4.
+    libahci.ignore_sss=1 - Ignore staggered spinup flag, ускоряет загрузку жестких дисков
+    raid=noautodetect - raid я не использую, думаю вы тоже поэтому отключаем.
+    selinux=0 - система полномочий selinux на домашней машине тоже ни к чему, без нее будет быстрее.
+    lpj=свое - позволяет задать константу loops_per_jiffy, что позволит ядру не вычислять ее каждый раз и сэкономит до 250 миллисекунд. Это значение индивидуально для каждого компьютера.
+
+Чтобы узнать значение последнего параметра выполните:
+
+dmesg | grep 'lpj='
+
+
+sudo systemctl mask NetworkManager-wait-online.service
