@@ -1,0 +1,20 @@
+pacman -S name  установка
+pacman -R name  удаление (без зависимостей)
+pacman -Rs name (удаление с зависимостями)
+pacman -Syu обновление всех пакетов
+pacman -Qe  вывести на экран все утановленные пакеты
+pacman -Qm вывести пакеты из AUR
+pacman -Qi name информация о пакете
+pacman -Qdt выводит пакеты сироты
+pacman -Rsnu $(pacman -Qdtq) удаляет пакеты сироты
+
+Откат пакетов
+
+ls /var/cache/pacman/pkg/firefox* 
+sudo pacman -U /var/cache/pacman/pkg/имя_пакета_версия.pkg.tar.zst
+
+pacman -Sc  удалить кеш пакетов, оставив последние версии
+pacman -Scc удалить весь кеш (НЕ СОВЕТУЮ ЭТО ДЕЛАТЬ! хай будет.)
+
+Server= https://archive.archlinux.org/repos/2023/07/25/$repo/os/$arch - строка которую необходимо добавить в mirrorlist для отката системы.
+pacman -Syyuu
