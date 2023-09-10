@@ -1,0 +1,39 @@
+sudo pacman -S winetricks wine-mono giflib  libpng  libldap  gnutls openal v4l-utils  libgpg-error  alsa-plugins  libjpeg-turbo  sqlite  libxcomposite libxinerama  libgcrypt ncurses  opencl-icd-loader  libxslt  libva  gtk3  gst-plugins-base-libs  vulkan-icd-loader opencl-nvidia
+
+pulseaudio 
+sudo pacman -S  libpulse lib32-libpulse  lib32-libpulse lib32-alsa-plugins alsa-lib lib32-alsa-lib 
+
+32 бита
+sudo pacman -S lib32-giflib lib32-libpng lib32-libldap lib32-gnutls mpg123 lib32-mpg123 lib32-openal  lib32-v4l-utils lib32-libgpg-error lib32-libjpeg-turbo lib32-sqlite  lib32-libxcomposite lib32-libgcrypt lib32-libxinerama  lib32-ncurses lib32-opencl-icd-loader lib32-libxslt lib32-libva lib32-gtk3 lib32-gst-plugins-base-libs lib32-vulkan-icd-loader lib32-opencl-nvidia lib32-nvidia-utils 
+
+wine-ge-custom 
+
+git clone https://aur.archlinux.org/wine-ge-custom.git
+cd wine-ge-custom
+sed -i 's/-march=nocona -mtune=core-avx2/-march=native -mtune=native/' PKGBUILD  # Нативные флаги
+makepkg -sric
+
+dxvk-mingw 
+
+git clone https://aur.archlinux.org/dxvk-mingw.git
+cd PKGBUILDs/public/dxvk-mingw
+mv PKGBUILD.testing PKGBUILD
+sed -i 's/-march=haswell -mtune=haswell/-march=native -mtune=native/g' PKGBUILD # Нативные флаги
+makepkg -sric # Сборка и установка
+WINEPREFIX=~/.wine setup_dxvk install
+
+vkd3d-proton-mingw
+
+git clone https://aur.archlinux.org/vkd3d-proton-mingw.git # Скачивание исходников
+cd vkd3d-proton-mingw                                      # Переход в директорию
+sed -i 's/-march=nocona -mtune=core-avx2 -pipe/-march=native -mtune=native -pipe/g' PKGBUILD # Нативные флаги
+makepkg -sric    
+
+setup_vkd3d_proton install ~/.путь_к_папке_wine
+WINEPREFIX=~/.путь_к_папке_wine winecfg
+
+sudo pacman -S cpupower
+
+cpupower-gui -aur
+
+gpg --keyserver keys.gnupg.net --recv-keys ключ  -- на случай сбоя при компиляции.
